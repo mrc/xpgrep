@@ -3,15 +3,16 @@ open System.Xml
 open System.Xml.XPath
 
 let xgrep (xpath:string) (filenames:seq<string>) =
-  let results =
+  let (results:seq<XPathNavigator>) =
     filenames
     |> Seq.map (fun filename -> XPathDocument(filename))
     |> Seq.map (fun doc -> doc.CreateNavigator())
     |> Seq.map (fun nav -> nav.Select(xpath) |> Seq.cast)
     |> Seq.concat
 
-  for (r:XPathNavigator) in results do
-    printfn "%s" r.BaseURI
+  for r in results do
+    let (info:IXmlLineInfo) = (r :> Object) :?> IXmlLineInfo
+    printfn "-- %s:%d:%d" r.BaseURI info.LineNumber info.LinePosition
     printfn " %s" r.OuterXml
 
   ()
