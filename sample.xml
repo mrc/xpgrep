@@ -1,0 +1,16 @@
+<sample>
+  <turtles>
+    <turtle name="Leonardo">
+      <weapon>Katana</weapon>
+    </turtle>
+    <turtle name="Michelangelo">
+      <weapon>Nunchakus</weapon>
+    </turtle>
+    <turtle name="Donatello">
+      <weapon>Bo staff</weapon>
+    </turtle>
+    <turtle name="Raphael">
+      <weapon>Sai</weapon>
+    </turtle>
+  </turtles>
+</sample>
