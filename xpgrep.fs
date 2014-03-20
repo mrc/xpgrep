@@ -12,7 +12,7 @@ let xgrep (xpath:string) (filenames:seq<string>) =
 
   for r in results do
     let (info:IXmlLineInfo) = (r :> Object) :?> IXmlLineInfo
-    printfn "-- %s:%d:%d" r.BaseURI info.LineNumber info.LinePosition
+    printfn "<!-- %s:%d (%A) -->" r.BaseURI info.LineNumber r.NodeType
     printfn " %s" r.OuterXml
 
   ()
@@ -24,5 +24,3 @@ let main args =
 
   xgrep xpath filenames
   0
-
-
