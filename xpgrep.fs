@@ -1,21 +1,22 @@
+module Xpgrep
+
 open System
 open System.Xml
 open System.Xml.XPath
 
-let xgrep (xpath:string) (filenames:seq<string>) =
-  let (results:seq<XPathNavigator>) =
-    filenames
-    |> Seq.map (fun filename -> XPathDocument(filename))
-    |> Seq.map (fun doc -> doc.CreateNavigator())
-    |> Seq.map (fun nav -> nav.Select(xpath) |> Seq.cast)
-    |> Seq.concat
+type XgrepResult = {filename:string; nav:XPathNavigator}
 
-  for r in results do
-    let (info:IXmlLineInfo) = (r :> Object) :?> IXmlLineInfo
-    printfn "<!-- %s:%d (%A) -->" r.BaseURI info.LineNumber r.NodeType
-    printfn " %s" r.OuterXml
+let xgrep (xpath:string) (filenames:seq<string>) : seq<XgrepResult> =
+  seq { for filename in filenames do
+        for nav in XPathDocument(filename)
+          .CreateNavigator()
+          .Select(xpath) |> Seq.cast do
+          yield {filename=filename; nav=nav} }
 
-  ()
+let showResult (result:XgrepResult) =
+  let (info:IXmlLineInfo) = (result.nav :> Object) :?> IXmlLineInfo
+  printfn "<!-- %s:%d (%A) -->" result.filename info.LineNumber result.nav.NodeType
+  printfn " %s" result.nav.OuterXml
 
 [<EntryPoint>]
 let main args =
@@ -23,4 +24,5 @@ let main args =
   let filenames = Seq.skip 1 args
 
   xgrep xpath filenames
+  |> Seq.iter showResult
   0
