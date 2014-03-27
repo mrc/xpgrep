@@ -1,28 +1,27 @@
-module Xpgrep
-
 open System
 open System.Xml
 open System.Xml.XPath
 
-type XgrepResult = {filename:string; nav:XPathNavigator}
+module Xpgrep =
 
-let xgrep (xpath:string) (filenames:seq<string>) : seq<XgrepResult> =
-  seq { for filename in filenames do
-        for nav in XPathDocument(filename)
-          .CreateNavigator()
-          .Select(xpath) |> Seq.cast do
-          yield {filename=filename; nav=nav} }
+  type XgrepResult = {filename:string; nav:XPathNavigator}
 
-let showResult (result:XgrepResult) =
-  let (info:IXmlLineInfo) = (result.nav :> Object) :?> IXmlLineInfo
-  printfn "<!-- %s:%d (%A) -->" result.filename info.LineNumber result.nav.NodeType
-  printfn " %s" result.nav.OuterXml
+  let xgrep (xpath:string) (filenames:seq<string>) : seq<XgrepResult> =
+    seq { for filename in filenames do
+          for nav in XPathDocument(filename)
+            .CreateNavigator()
+            .Select(xpath) |> Seq.cast do
+            yield {filename=filename; nav=nav} }
 
-[<EntryPoint>]
-let main args =
-  let xpath = args.[0]
-  let filenames = Seq.skip 1 args
+  let showResult (result:XgrepResult) =
+    let (info:IXmlLineInfo) = (result.nav :> Object) :?> IXmlLineInfo
+    printfn "<!-- %s:%d (%A) -->" result.filename info.LineNumber result.nav.NodeType
+    printfn " %s" result.nav.OuterXml
 
-  xgrep xpath filenames
-  |> Seq.iter showResult
-  0
+  [<EntryPoint>]
+  let main args =
+    let xpath = args.[0]
+    let filenames = Seq.skip 1 args
+    xgrep xpath filenames
+    |> Seq.iter showResult
+    0
